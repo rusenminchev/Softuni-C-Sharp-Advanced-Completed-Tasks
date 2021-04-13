@@ -1,48 +1,52 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
-namespace _02._Snake
+namespace C_Sharp___Advanced___Exam_Prep
 {
     class Program
     {
         static void Main(string[] args)
         {
+
             int n = int.Parse(Console.ReadLine());
 
             char[,] matrix = new char[n, n];
 
-            int snakeRow = -1;
-            int snakeCol = -1;
-
+            int snakePositionRow = -1;
+            int snakePositionCol = -1;
             int firstBurrowRow = -1;
             int firstBurrowCol = -1;
             int secondBurrowRow = -1;
             int secondBurrowCol = -1;
 
-            int foodEatenCount = 0;
+
+            int foodCount = 0;
 
             for (int row = 0; row < matrix.GetLength(0); row++)
             {
-                string input = Console.ReadLine();
+                string rowsValue = Console.ReadLine();
 
                 for (int col = 0; col < matrix.GetLength(1); col++)
                 {
-                    matrix[row, col] = input[col];
+
+                    matrix[row, col] = rowsValue[col];
 
                     if (matrix[row, col] == 'S')
                     {
-                        snakeRow = row;
-                        snakeCol = col;
+                        snakePositionRow = row;
+                        snakePositionCol = col;
+
+                       
+
                     }
 
-                    if (matrix[row, col] == 'B')
+                    if(matrix[row, col] == 'B')
                     {
-                        if (firstBurrowRow == -1 && firstBurrowCol == -1)
+                        if (firstBurrowRow == -1)
                         {
                             firstBurrowRow = row;
                             firstBurrowCol = col;
                         }
-                        else if (secondBurrowRow == -1 && secondBurrowCol == -1)
+                        else
                         {
                             secondBurrowRow = row;
                             secondBurrowCol = col;
@@ -51,73 +55,88 @@ namespace _02._Snake
                 }
             }
 
-            string command;
 
-            while ((command = Console.ReadLine()) != "end")
+            while (true)
             {
 
-                matrix[snakeRow, snakeCol] = '.';
+                if (foodCount >= 10)
+                {
 
-                if (command == "up")
-                {
-                    snakeRow--;
-                }
-                else if (command == "down")
-                {
-                    snakeRow++;
-                }
-                else if (command == "left")
-                {
-                    snakeCol--;
-                }
-                else if (command == "right")
-                {
-                    snakeCol++;
-                }
-
-                if (IsInTheMatrix(matrix, snakeRow, snakeCol))
-                {
-                    if (matrix[snakeRow, snakeCol] == '*')
-                    {
-                        foodEatenCount++;
-
-                        if (foodEatenCount == 10)
-                        {
-                            matrix[snakeRow, snakeCol] = 'S';
-                            break;
-                        }
-                    }
-                    else if (matrix[snakeRow, snakeCol] == 'B')
-                    {
-                        matrix[snakeRow, snakeCol] = '.';
-
-                        if (snakeRow == firstBurrowRow && snakeCol == firstBurrowCol)
-                        {
-                            snakeRow = secondBurrowRow;
-                            snakeCol = secondBurrowCol;
-                        }
-                        else if (snakeRow == secondBurrowRow && snakeCol == firstBurrowCol)
-                        {
-                            snakeRow = firstBurrowRow;
-                            snakeCol = firstBurrowCol;
-                        }
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Game over!");
+                    matrix[snakePositionRow, snakePositionCol] = 'S';
+                    Console.WriteLine("You won! You fed the snake.");
                     break;
                 }
 
-                matrix[snakeRow, snakeCol] = 'S';
+
+               
+                matrix[snakePositionRow, snakePositionCol] = '.';
+
+                string command = Console.ReadLine();
+
+                if (command == "up")
+                {
+                    
+                    snakePositionRow--;
+     
+                }
+                else if (command == "down")
+                {
+
+                    snakePositionRow++;
+
+
+                }
+                else if (command == "left")
+                {
+                    snakePositionCol--;
+
+
+                }
+                else if (command == "right")
+                {
+                    snakePositionCol++;
+
+
+                }
+
+                if (IsOutsideOfTheTerritory(matrix, snakePositionRow, snakePositionCol))
+                {
+                    Console.WriteLine("Game Over");
+                    break;
+                
+                }
+
+                if (matrix[snakePositionRow, snakePositionCol] == '*')
+                {
+                    foodCount++;
+                }
+
+                if (snakePositionRow == firstBurrowRow && snakePositionCol == firstBurrowCol)
+                {
+                    matrix[snakePositionRow, snakePositionCol] = '.';
+                    snakePositionRow = secondBurrowRow;
+                    snakePositionCol = secondBurrowCol;
+
+                }
+                else if (snakePositionRow == secondBurrowRow && snakePositionCol == secondBurrowCol)
+                {
+                    snakePositionRow = firstBurrowRow;
+                    snakePositionCol = firstBurrowCol;
+                }
+
+                    matrix[snakePositionRow, snakePositionCol] = 'S';
+
+               
+
+                Print(matrix);
+
             }
 
-            if (foodEatenCount == 10)
-            {
-                Console.WriteLine("You won! You fed the snake.");
-            }
+            Console.WriteLine($"Food Eaten: {foodCount}");
+        }
 
-            Console.WriteLine($"Food eaten: {foodEatenCount}");
+        static void Print(char[,] matrix)
+        {
 
             for (int row = 0; row < matrix.GetLength(0); row++)
             {
@@ -128,12 +147,19 @@ namespace _02._Snake
                 }
                 Console.WriteLine();
             }
+        
         }
 
-        private static bool IsInTheMatrix(char[,] matrix, int snakeRow, int snakeCol)
+        static bool IsOutsideOfTheTerritory(char[,] matrix, int snakeRow, int snakeCol)
         {
-            return snakeRow >= 0 && snakeRow < matrix.GetLength(0) &&
-                   snakeCol >= 0 && snakeCol < matrix.GetLength(1);
+
+            if (snakeRow < 0 || snakeCol < 0 || snakeRow >= matrix.GetLength(0) || snakeCol >= matrix.GetLength(1))
+            {
+                return true;
+            }
+
+            return false;
         }
+
     }
 }
